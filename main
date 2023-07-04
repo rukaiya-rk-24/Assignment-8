@@ -1,0 +1,172 @@
+Quesn 2.
+bool checkValidString(string s) {
+        int l=0,r=0,st=0;
+        for(int i=0;i<s.size();i++){
+            if(r>(l+st)) return false;
+            if(s[i]=='(') l++;
+            else if(s[i]==')') r++;
+            else st++;
+        }
+        bool f1 = abs(l-r)<=st;
+        l=0;r=0;st=0;
+        for(int i=s.size()-1;i>=0;i--)
+        {
+            if(s[i]=='(')l++;
+            else if(s[i]==')')r++;
+            else st++;
+
+            if(l>r+st)return false;
+        }
+        bool f2=(r+st>=l);
+        return (f1 and f2);
+    }
+
+
+
+Quesn 4.
+void pre(TreeNode* root, string &ans){
+        if(!root) return;
+        ans+=to_string(root->val);
+        if(!root->left && !root->right) return;
+        ans+="(";
+        pre(root->left,ans);
+        ans+=")";
+        if(root->right){
+            ans+="(";
+            pre(root->right,ans);
+            ans+=")";
+        }
+    }
+    string tree2str(TreeNode* root) {
+        string ans;
+        pre(root,ans);
+        return ans;
+    }
+
+    
+
+Quesn 5.
+    int compress(vector<char>& chars) {
+        stack<char> st;
+        vector<pair<char,int>> v;
+        int len=0,j=0;
+        st.push(chars[0]);
+        for(int i=1;i<chars.size();i++){
+            if(st.top()==chars[i]) len+=1;
+            else{
+                char a=st.top();
+                st.pop();
+                st.push(chars[i]);
+                v.push_back({a,len+1});
+                len=0;
+            }
+        }
+        if(!st.empty()) v.push_back({st.top(),len+1});
+        chars.clear();
+        for(auto x:v){
+            chars.push_back(x.first);
+            if(x.second>9){
+                string a = to_string(x.second);
+                int j=0,n=a.size();
+                while(j<n){
+                    chars.push_back(a[j++]);
+                }
+            }
+            else if(x.second!=1)chars.push_back(x.second+'0');
+        }
+        return chars.size();
+    }
+
+
+
+
+Quesn 6.
+vector<int> findAnagrams(string s, string p) {
+        int s_len = s.size();
+        int p_len = p.size();
+        vector<int> ans;
+        if(s_len<p_len) return ans;
+        vector<int> freq(26,0);
+        vector<int> window(26,0);
+        for(int i=0;i<p_len;i++){
+            window[p[i]-'a']++;
+            freq[s[i]-'a']++;
+        }
+        if(freq==window) ans.push_back(0);
+        for(int i=p_len;i<s_len;i++){
+            freq[s[i]-'a']++;
+            freq[s[i-p_len]-'a']--;
+            if(freq==window) ans.push_back(i-p_len+1); 
+        }
+        return ans;
+    }
+
+
+
+
+Quesn 7.
+string decodeString(string s) {
+        stack<string> st;
+        int ln= s.size();
+        
+        for(int i=0;i<ln;i++){
+            if(s[i]!= ']') st.push(string(1,s[i]));
+            else{
+                //finding nested problem,ie string inside []
+                string temp="";
+                while(st.top()!= string(1,'[')){
+                    temp+= st.top();
+                    st.pop();
+                }
+                reverse(temp.begin(),temp.end());
+                st.pop();
+                
+                //finding number
+                string num="";
+                while(!st.empty() && (st.top()>=string(1,'0') && st.top()<=string(1,'9'))){
+                    num+=st.top();
+                    st.pop();
+                }
+                reverse(num.begin(),num.end());
+                
+                int n= num.size()!=0? stoi(num): 1;
+                string toPush= "";
+                for(int i=0;i<n;i++)toPush+= temp;
+                reverse(toPush.begin(),toPush.end());
+                st.push(toPush);
+            }
+        }
+        
+        string ans="";
+        while(!st.empty()){
+            ans+= st.top();
+            st.pop();
+        }
+        
+        reverse(ans.begin(),ans.end());
+        return ans;
+
+
+
+Quesn 8.
+bool buddyStrings(string s, string goal) {
+        int first=-1,scnd=-1;
+        if(s.size()!=goal.size()) return false;
+        if(s==goal){
+            vector<int> freq(26,0);
+            for(char c:s){
+                freq[c-'a']++;
+                if(freq[c-'a']==2) return true;
+            }
+            return false;
+        }
+        for(int i=0;i<s.size();i++){
+            if(s[i]!=goal[i]){
+                if(first==-1) first=i;
+                else if(scnd==-1) scnd=i;
+                else return false;
+            }
+        }
+        if(scnd==-1) return false;
+        return s[first]==goal[scnd] && s[scnd]==goal[first];
+    }
